@@ -40,22 +40,25 @@ export default function Home() {
       return;
 
     const tempPatientList = [];
-    const clipboard = await navigator.clipboard.readText();
-    clipboard
-      .split("\n")
-      .filter((row) => row?.length > 0)
-      .map((row) => {
-        tempPatientList.push(row.split("\t"));
-      });
-    setPatientList(tempPatientList);
-    console.log(tempPatientList);
+    try {
+      const clipboard = await navigator.clipboard.readText();
+      clipboard
+        .split("\n")
+        .filter((row) => row?.length > 0)
+        .map((row) => {
+          tempPatientList.push(row.split("\t"));
+        });
+      setPatientList(tempPatientList);
+      console.log(tempPatientList);
+    } catch (error) {}
   };
 
-  useEffect(async () => {
+  useEffect(() => {
     const tempList = patientList.filter((patient) => {
       return SWAB_DAYS.includes(getDayDiffFrom(patient[columnAdmission]));
     });
     setDueList(tempList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientList]);
 
   return (
