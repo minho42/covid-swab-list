@@ -46,7 +46,8 @@ export default function Home() {
         .split("\n")
         .filter((row) => row?.length > 0)
         .map((row) => {
-          tempPatientList.push(row.split("\t"));
+          const columns = row.split("\t");
+          tempPatientList.push(columns);
         });
       setPatientList(tempPatientList);
       console.log(tempPatientList);
@@ -74,7 +75,7 @@ export default function Home() {
           bed
           <input
             onChange={(e) => setColumnBed(e.target.value)}
-            className="rounded-md border-2 border-gray-300  py-0.5 ml-1 w-12 text-center"
+            className="rounded-md border-2 border-gray-300 py-0.5 ml-1 w-14 text-center"
             type="number"
             value={columnBed}
           ></input>
@@ -83,12 +84,12 @@ export default function Home() {
           name
           <input
             onChange={(e) => setColumnName(e.target.value)}
-            className="rounded-md border-2 border-gray-300  py-0.5 ml-1 w-12 text-center"
+            className="rounded-md border-2 border-gray-300 py-0.5 ml-1 w-14 text-center"
             type="number"
             value={columnName}
           ></input>
         </label>
-        <label>
+        {/* <label>
           admission
           <input
             onChange={(e) => setColumnAdmission(e.target.value)}
@@ -96,7 +97,7 @@ export default function Home() {
             type="number"
             value={columnAdmission}
           ></input>
-        </label>
+        </label> */}
         <button
           onClick={getPatientListFromClipboard}
           className="bg-pink-600 text-white rounded-full px-4 py-1 font-semibold "
