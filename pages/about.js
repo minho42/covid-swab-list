@@ -27,7 +27,7 @@ export default function About() {
       <div>
         <div className="text-xl font-semibold">Security</div>
         <ul className="list-disc">
-          <li>This website doesn't have a server</li>
+          <li>This website does not have a server</li>
           <li>Nothing is saved anywhere</li>
           <li>99.99% secure</li>
         </ul>

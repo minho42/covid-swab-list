@@ -139,7 +139,7 @@ export default function Home() {
 
       <ul className="list-disc text-gray-500">
         <li>Double check if the list is correct</li>
-        <li>May include people who doesn't need swab</li>
+        <li>May include people who does not need swab</li>
       </ul>
     </div>
   );
