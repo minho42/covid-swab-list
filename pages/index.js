@@ -17,10 +17,9 @@ const getDayDiffFrom = (d) => {
 export default function Home() {
   const SWAB_DAYS = [0, 2, 5, 8];
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const [columnBed, setColumnBed] = useState(1);
-  const [columnName, setColumnName] = useState(3);
-  const [columnAdmission, setColumnAdmission] = useState(4);
-  const [isClipboardReady, setIsClipboardReady] = useState(false);
+  const [indexForBed, setIndexForBed] = useState(1);
+  const [indexForName, setIndexForName] = useState(3);
+  const [indexForAdmission, setIndexForAdmission] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [patientList, setPatientList] = useState([]);
   const [dueList, setDueList] = useState([]);
@@ -28,16 +27,20 @@ export default function Home() {
     dueList && dueList?.length > 0 ? `(${dueList.length})` : ""
   }`;
 
+  function isClipboardDataValid(list) {
+    const isListEmpty = list.length === 0;
+    const isColumnsTooShort = list[0].length < 4;
+    const isIncludingColon = list[0].some((item) => item.includes(":")); // admission
+    const isIncludingComma = list[0].some((item) => item.includes(",")); // name
+    if (isListEmpty || isColumnsTooShort || !isIncludingColon || !isIncludingComma) {
+      return false;
+    }
+    return true;
+  }
+
   const getPatientListFromClipboard = async () => {
-    if (
-      !columnBed ||
-      !columnName ||
-      !columnAdmission ||
-      columnBed < 1 ||
-      columnName < 1 ||
-      columnAdmission < 1
-    )
-      return;
+    if (!indexForBed || !indexForName || indexForBed < 1 || indexForName < 1) return;
+    setErrorMessage("");
 
     const tempPatientList = [];
     try {
@@ -46,17 +49,27 @@ export default function Home() {
         .split("\n")
         .filter((row) => row?.length > 0)
         .map((row) => {
-          const columns = row.split("\t");
-          tempPatientList.push(columns);
+          tempPatientList.push(row.split("\t"));
         });
+
+      if (!isClipboardDataValid(tempPatientList)) {
+        throw new Error("Clipboard data invalid");
+      }
+
+      const admissionIndex = tempPatientList[0].findIndex((column) => column.includes(":"));
+      setIndexForAdmission(admissionIndex);
       setPatientList(tempPatientList);
-      console.log(tempPatientList);
-    } catch (error) {}
+
+      // console.log(tempPatientList[0]);
+    } catch (error) {
+      setPatientList([]);
+      setErrorMessage(error.message);
+    }
   };
 
   useEffect(() => {
     const tempList = patientList.filter((patient) => {
-      return SWAB_DAYS.includes(getDayDiffFrom(patient[columnAdmission]));
+      return SWAB_DAYS.includes(getDayDiffFrom(patient[indexForAdmission]));
     });
     setDueList(tempList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,47 +82,41 @@ export default function Home() {
         <meta name="description" content="Covid swab list" />
       </Head>
 
-      <div className="flex items-center space-x-2 text-gray-500">
+      <div className="flex items-center space-x-2">
         Columns for:
         <label>
           bed
           <input
-            onChange={(e) => setColumnBed(e.target.value)}
+            onChange={(e) => setIndexForBed(e.target.value)}
             className="rounded-md border-2 border-gray-300 py-0.5 ml-1 w-14 text-center"
             type="number"
-            value={columnBed}
+            value={indexForBed}
           ></input>
         </label>
         <label>
           name
           <input
-            onChange={(e) => setColumnName(e.target.value)}
+            onChange={(e) => setIndexForName(e.target.value)}
             className="rounded-md border-2 border-gray-300 py-0.5 ml-1 w-14 text-center"
             type="number"
-            value={columnName}
+            value={indexForName}
           ></input>
         </label>
-        {/* <label>
-          admission
-          <input
-            onChange={(e) => setColumnAdmission(e.target.value)}
-            className="rounded-md border-2 border-gray-300  py-0.5 ml-1 w-12 text-center"
-            type="number"
-            value={columnAdmission}
-          ></input>
-        </label> */}
         <button
           onClick={getPatientListFromClipboard}
-          className="bg-pink-600 text-white rounded-full px-4 py-1 font-semibold "
+          className="bg-pink-600 hover:bg-pink-500 text-white rounded-full px-4 py-1 font-semibold "
         >
           Make
         </button>
-        {!isClipboardReady && errorMessage ? (
-          <div className="my-1 text-center bg-pink-100 text-pink-600 rounded py-0.5">{errorMessage}</div>
-        ) : (
-          ""
-        )}
       </div>
+
+      {errorMessage ? (
+        <div className="my-1 text-center bg-pink-100 text-pink-600 font-semibold rounded py-1">
+          {errorMessage}
+        </div>
+      ) : (
+        ""
+      )}
 
       <div className="text-2xl font-semibold">{title}</div>
 
@@ -128,10 +135,10 @@ export default function Home() {
               dueList.map((patient, index) => {
                 return (
                   <tr key={index}>
-                    <td className="border border-gray-400 px-2 py-0.5">{patient[columnBed]}</td>
-                    <td className="border border-gray-400 px-2 py-0.5 text-left">{patient[columnName]}</td>
+                    <td className="border border-gray-400 px-2 py-0.5">{patient[indexForBed]}</td>
+                    <td className="border border-gray-400 px-2 py-0.5 text-left">{patient[indexForName]}</td>
                     <td className="border border-gray-400 px-2 py-0.5">
-                      {getDayDiffFrom(patient[columnAdmission])}
+                      {getDayDiffFrom(patient[indexForAdmission])}
                     </td>
                     <td className="border border-gray-400 px-2 py-0.5"></td>
                   </tr>
@@ -141,7 +148,7 @@ export default function Home() {
         </table>
       </div>
 
-      <ul className="list-disc text-gray-500">
+      <ul className="list-disc">
         <li>Double check if the list is correct</li>
         <li>May include people who does not need swab</li>
       </ul>
