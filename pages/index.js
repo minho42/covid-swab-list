@@ -19,10 +19,12 @@ export default function Home() {
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const [indexForBed, setIndexForBed] = useState(1);
   const [indexForName, setIndexForName] = useState(3);
-  const [indexForAdmission, setIndexForAdmission] = useState(0);
+  const [indexForAdmission, setIndexForAdmission] = useState(8);
   const [errorMessage, setErrorMessage] = useState("");
   const [patientList, setPatientList] = useState([]);
   const [dueList, setDueList] = useState([]);
+  const [hidePeopleNotDue, setHidePeopleNotDue] = useState(true);
+
   const title = `Covid swabs due for ${new Date().toLocaleDateString()}, ${daysOfWeek[new Date().getDay()]} ${
     dueList && dueList?.length > 0 ? `(${dueList.length})` : ""
   }`;
@@ -79,7 +81,7 @@ export default function Home() {
     });
     setDueList(tempList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientList]);
+  }, [patientList, hidePeopleNotDue]);
 
   return (
     <div className="space-y-3">
@@ -87,7 +89,6 @@ export default function Home() {
         <title>Covid swab list</title>
         <meta name="description" content="Covid swab list" />
       </Head>
-
       <div className="flex items-center space-x-2">
         Column index for:
         <label>
@@ -117,21 +118,33 @@ export default function Home() {
             value={indexForAdmission}
           ></input>
         </label>
+        {/* <label className="flex items-center pl-3">
+          Show all
+          <input
+            onChange={() => setHidePeopleNotDue(!hidePeopleNotDue)}
+            className="ml-1 w-6 h-6"
+            type="checkbox"
+            value={hidePeopleNotDue}
+          ></input>
+        </label> */}
+      </div>
+
+      <div className="text-center">
         <button
           onClick={getPatientListFromClipboard}
           className="bg-pink-600 hover:bg-pink-500 text-white rounded-full px-4 py-1 font-semibold "
         >
           Make
         </button>
-      </div>
 
-      {errorMessage ? (
-        <div className="my-1 text-center bg-pink-100 text-pink-600 font-semibold rounded py-1">
-          {errorMessage}
-        </div>
-      ) : (
-        ""
-      )}
+        {errorMessage ? (
+          <div className="my-1 text-center bg-pink-100 text-pink-600 font-semibold rounded py-1">
+            {errorMessage}
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
 
       <div className="text-2xl font-semibold">{title}</div>
 
