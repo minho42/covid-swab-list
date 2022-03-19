@@ -39,7 +39,15 @@ export default function Home() {
   }
 
   const getPatientListFromClipboard = async () => {
-    if (!indexForBed || !indexForName || indexForBed < 1 || indexForName < 1) return;
+    if (
+      !indexForBed ||
+      !indexForName ||
+      !indexForAdmission ||
+      indexForBed < 1 ||
+      indexForName < 1 ||
+      indexForAdmission < 1
+    )
+      return;
     setErrorMessage("");
 
     const tempPatientList = [];
@@ -56,8 +64,6 @@ export default function Home() {
         throw new Error("Clipboard data invalid");
       }
 
-      const admissionIndex = tempPatientList[0].findIndex((column) => column.includes(":"));
-      setIndexForAdmission(admissionIndex);
       setPatientList(tempPatientList);
 
       // console.log(tempPatientList[0]);
@@ -83,7 +89,7 @@ export default function Home() {
       </Head>
 
       <div className="flex items-center space-x-2">
-        Columns for:
+        Column index for:
         <label>
           bed
           <input
@@ -100,6 +106,15 @@ export default function Home() {
             className="rounded-md border-2 border-gray-300 py-0.5 ml-1 w-14 text-center"
             type="number"
             value={indexForName}
+          ></input>
+        </label>
+        <label>
+          admission
+          <input
+            onChange={(e) => setIndexForAdmission(e.target.value)}
+            className="rounded-md border-2 border-gray-300 py-0.5 ml-1 w-14 text-center"
+            type="number"
+            value={indexForAdmission}
           ></input>
         </label>
         <button
