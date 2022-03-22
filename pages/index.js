@@ -129,7 +129,7 @@ export default function Home() {
           Show all
           <input
             onChange={() => setHideNotDue(!hideNotDue)}
-            className="ml-1 w-6 h-6"
+            className="ml-1 w-7 h-7"
             type="checkbox"
             defaultChecked={!hideNotDue}
           ></input>
