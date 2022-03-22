@@ -131,7 +131,7 @@ export default function Home() {
             onChange={() => setHideNotDue(!hideNotDue)}
             className="ml-1 w-6 h-6"
             type="checkbox"
-            value={hideNotDue}
+            defaultChecked={!hideNotDue}
           ></input>
         </label>
       </div>
