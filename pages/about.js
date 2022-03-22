@@ -3,7 +3,7 @@ export default function About() {
     <div className="space-y-3">
       <div>
         <div className="text-xl font-semibold">Swab days</div>
-        <ul className="list-disc">
+        <ul className="list-disc list-inside">
           <li>Calculated from admission date</li>
           <li>Swabs are due on: day [0, 2, 5, 8]</li>
         </ul>
@@ -11,7 +11,7 @@ export default function About() {
 
       <div>
         <div className="text-xl font-semibold">How to use</div>
-        <ul className="list-decimal">
+        <ul className="list-decimal list-inside">
           <li>Open [PowerChart]</li>
           <li>Go to [Patient List]</li>
           <li>Select all (Ctrl + A)</li>
@@ -26,7 +26,7 @@ export default function About() {
 
       <div>
         <div className="text-xl font-semibold">Security</div>
-        <ul className="list-disc">
+        <ul className="list-disc list-inside">
           <li>Nothing is saved anywhere</li>
           <li>99.99% secure</li>
         </ul>

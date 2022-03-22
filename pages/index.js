@@ -8,7 +8,8 @@ const getDayDiffFrom = (d) => {
 
   const [day, month, year] = d.split(" ")[0].split("/");
   const dateFrom = new Date(`${year}-${month}-${day}`);
-  const today = new Date();
+  // const today = new Date();
+  const today = new Date(new Date().toLocaleString("en-US", { timezone: "Australia/Sydney" }));
 
   const diff = today.getTime() - dateFrom.getTime();
   const diffInDay = diff / (1000 * 60 * 60 * 24);
@@ -22,13 +23,13 @@ export default function Home() {
   const [indexForName, setIndexForName] = useLocalStorage("indexForName", 3);
   const [indexForAdmission, setIndexForAdmission] = useLocalStorage("indexForAdmission", 8);
   const [errorMessage, setErrorMessage] = useState("");
+  const [clipboardData, setClipboardData] = useState([]);
   const [patientList, setPatientList] = useState([]);
-  const [dueList, setDueList] = useState([]);
-  const [hidePeopleNotDue, setHidePeopleNotDue] = useState(true);
+  const [hideNotDue, setHideNotDue] = useState(true);
 
-  const title = `Covid swabs due for ${new Date().toLocaleDateString()}, ${daysOfWeek[new Date().getDay()]} ${
-    dueList && dueList?.length > 0 ? `(${dueList.length})` : ""
-  }`;
+  const title = `Covid swabs due for ${new Date().toLocaleDateString()}, ${daysOfWeek[new Date().getDay()]} 
+   ${patientList && patientList?.length > 0 ? `(${patientList.filter((p) => p.isDue).length})` : ""}
+  `;
 
   function isClipboardDataValid(list) {
     const isListEmpty = list.length === 0;
@@ -41,7 +42,7 @@ export default function Home() {
     return true;
   }
 
-  const getPatientListFromClipboard = async () => {
+  const getDataFromClipboard = async () => {
     if (
       !indexForBed ||
       !indexForName ||
@@ -53,36 +54,42 @@ export default function Home() {
       return;
     setErrorMessage("");
 
-    const tempPatientList = [];
+    const tempClipboardData = [];
     try {
       const clipboard = await navigator.clipboard.readText();
       clipboard
         .split("\n")
         .filter((row) => row?.length > 0)
         .map((row) => {
-          tempPatientList.push(row.split("\t"));
+          tempClipboardData.push(row.split("\t"));
         });
 
-      if (!isClipboardDataValid(tempPatientList)) {
+      if (!isClipboardDataValid(tempClipboardData)) {
         throw new Error("Clipboard data invalid");
       }
 
-      setPatientList(tempPatientList);
-
-      // console.log(tempPatientList[0]);
+      setClipboardData(tempClipboardData);
+      // console.log(tempClipboardData[0]);
     } catch (error) {
-      setPatientList([]);
+      setClipboardData([]);
       setErrorMessage(error.message);
     }
   };
 
   useEffect(() => {
-    const tempList = patientList.filter((patient) => {
-      return SWAB_DAYS.includes(getDayDiffFrom(patient[indexForAdmission]));
+    const tempList = [];
+    clipboardData.forEach((row) => {
+      tempList.push({
+        bed: row[indexForBed],
+        name: row[indexForName],
+        admission: row[indexForAdmission],
+        day: getDayDiffFrom(row[indexForAdmission]),
+        isDue: SWAB_DAYS.includes(getDayDiffFrom(row[indexForAdmission])),
+      });
     });
-    setDueList(tempList);
+    setPatientList(tempList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientList, hidePeopleNotDue]);
+  }, [clipboardData]);
 
   return (
     <div className="space-y-3">
@@ -119,28 +126,28 @@ export default function Home() {
             value={indexForAdmission}
           ></input>
         </label>
-        {/* <label className="flex items-center pl-3">
+        <label className="flex items-center pl-3">
           Show all
           <input
-            onChange={() => setHidePeopleNotDue(!hidePeopleNotDue)}
+            onChange={() => setHideNotDue(!hideNotDue)}
             className="ml-1 w-6 h-6"
             type="checkbox"
-            value={hidePeopleNotDue}
+            value={hideNotDue}
           ></input>
-        </label> */}
+        </label>
       </div>
 
       <div className="text-center">
         <button
-          onClick={getPatientListFromClipboard}
-          className="bg-pink-600 hover:bg-pink-500 text-white rounded-full px-4 py-1 font-semibold "
+          onClick={getDataFromClipboard}
+          className="bg-pink-600 hover:bg-pink-500 text-white rounded-full text-2xl px-4 py-1 font-semibold "
         >
           Make
         </button>
 
         {errorMessage ? (
           <div className="my-1 text-center bg-pink-100 text-pink-600 font-semibold rounded py-1">
-            {errorMessage}
+            ⚠️ {errorMessage}
           </div>
         ) : (
           ""
@@ -149,27 +156,46 @@ export default function Home() {
 
       <div className="text-2xl font-semibold">{title}</div>
 
+      <div className="flex items-center gap-2 text-2xl font-semibold">
+        Bed:{" "}
+        {patientList
+          .filter((p) => p.isDue)
+          .map((p, index) => {
+            return (
+              <div key={index} className="">
+                {p.bed},
+              </div>
+            );
+          })}
+      </div>
+
       <div>
         <table className="w-full table-auto border border-gray-400 text-center">
           <thead>
             <tr>
-              <th className="w-2/12 border border-gray-400 px-2 py-0.5">Bed</th>
-              <th className="w-6/12 border border-gray-400 px-2 py-0.5">Name</th>
-              <th className="w-2/12 border border-gray-400 px-2 py-0.5">Day</th>
-              <th className="w-2/12 border border-gray-400 px-2 py-0.5">Done</th>
+              <th className="border border-gray-400 px-2 py-0.5">Bed</th>
+              <th className="border border-gray-400 px-2 py-0.5">Name</th>
+              <th className="border border-gray-400 px-2 py-0.5">Admission</th>
+              <th className="border border-gray-400 px-2 py-0.5">Day</th>
+              <th className="border border-gray-400 px-2 py-0.5">Due</th>
             </tr>
           </thead>
           <tbody>
-            {dueList &&
-              dueList.map((patient, index) => {
+            {patientList &&
+              patientList.map((patient, index) => {
                 return (
-                  <tr key={index}>
-                    <td className="border border-gray-400 px-2 py-0.5">{patient[indexForBed]}</td>
-                    <td className="border border-gray-400 px-2 py-0.5 text-left">{patient[indexForName]}</td>
-                    <td className="border border-gray-400 px-2 py-0.5">
-                      {getDayDiffFrom(patient[indexForAdmission])}
-                    </td>
-                    <td className="border border-gray-400 px-2 py-0.5"></td>
+                  <tr
+                    key={index}
+                    className={`${patient.isDue ? "" : "text-gray-400"} ${
+                      hideNotDue && !patient.isDue ? "hidden" : ""
+                    }`}
+                  >
+                    <td className="border border-gray-400 px-2">{patient.bed}</td>
+                    <td className="border border-gray-400 px-2 text-left">{patient.name}</td>
+                    {/* <td className="border border-gray-400 px-2">{patient.admission.split(" ")[0]}</td> */}
+                    <td className="border border-gray-400 px-2">{patient.admission}</td>
+                    <td className="border border-gray-400 px-2">{patient.day}</td>
+                    <td className="border border-gray-400 px-2">{patient.isDue ? "Due" : ""}</td>
                   </tr>
                 );
               })}
@@ -177,9 +203,9 @@ export default function Home() {
         </table>
       </div>
 
-      <ul className="list-disc">
-        <li>Double check if the list is correct</li>
+      <ul className="list-disc list-inside">
         <li>May include people who does not need swab</li>
+        <li>Check who is being transferred in days</li>
       </ul>
     </div>
   );
