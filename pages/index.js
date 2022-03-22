@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
+import { useLocalStorage } from "../components/useLocalStorage";
 
 const getDayDiffFrom = (d) => {
   // "14/03/2022 22:30"
@@ -17,9 +18,9 @@ const getDayDiffFrom = (d) => {
 export default function Home() {
   const SWAB_DAYS = [0, 2, 5, 8];
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const [indexForBed, setIndexForBed] = useState(1);
-  const [indexForName, setIndexForName] = useState(3);
-  const [indexForAdmission, setIndexForAdmission] = useState(8);
+  const [indexForBed, setIndexForBed] = useLocalStorage("indexForBed", 1);
+  const [indexForName, setIndexForName] = useLocalStorage("indexForName", 3);
+  const [indexForAdmission, setIndexForAdmission] = useLocalStorage("indexForAdmission", 8);
   const [errorMessage, setErrorMessage] = useState("");
   const [patientList, setPatientList] = useState([]);
   const [dueList, setDueList] = useState([]);
