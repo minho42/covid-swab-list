@@ -23,14 +23,6 @@ export default function About() {
           <li>[Allow] permission to access clipboard</li>
         </ul>
       </div>
-
-      <div>
-        <div className="text-xl font-semibold">Security</div>
-        <ul className="list-disc list-inside">
-          <li>Nothing is saved anywhere</li>
-          <li>99.99% secure</li>
-        </ul>
-      </div>
     </div>
   );
 }
