@@ -8,12 +8,11 @@ const getDayDiffFrom = (d) => {
 
   const [day, month, year] = d.split(" ")[0].split("/");
   const dateFrom = new Date(`${year}-${month}-${day}`);
-  // const today = new Date();
-  const today = new Date(new Date().toLocaleString("en-US", { timezone: "Australia/Sydney" }));
+  const today = new Date();
 
   const diff = today.getTime() - dateFrom.getTime();
   const diffInDay = diff / (1000 * 60 * 60 * 24);
-  return Math.ceil(diffInDay);
+  return Math.round(diffInDay);
 };
 
 export default function Home() {
