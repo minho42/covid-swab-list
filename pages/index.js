@@ -27,7 +27,11 @@ export default function Home() {
   const [hideNotDue, setHideNotDue] = useState(true);
 
   const title = `Covid swabs due for ${new Date().toLocaleDateString()}, ${daysOfWeek[new Date().getDay()]} 
-   ${patientList && patientList?.length > 0 ? `(${patientList.filter((p) => p.isDue).length})` : ""}
+   ${
+     patientList && patientList?.length > 0
+       ? `(${patientList.filter((p) => p.isDue).length}/${patientList.length})`
+       : ""
+   }
   `;
 
   function isClipboardDataValid(list) {
@@ -125,15 +129,17 @@ export default function Home() {
             value={indexForAdmission}
           ></input>
         </label>
-        <label className="flex items-center pl-3">
-          Show all
-          <input
-            onChange={() => setHideNotDue(!hideNotDue)}
-            className="ml-1 w-7 h-7"
-            type="checkbox"
-            defaultChecked={!hideNotDue}
-          ></input>
-        </label>
+        {patientList && patientList.length > 0 && (
+          <label className="flex items-center pl-3">
+            Show all
+            <input
+              onChange={() => setHideNotDue(!hideNotDue)}
+              className="ml-1 w-7 h-7"
+              type="checkbox"
+              defaultChecked={!hideNotDue}
+            ></input>
+          </label>
+        )}
       </div>
 
       <div className="text-center">
@@ -155,18 +161,20 @@ export default function Home() {
 
       <div className="text-2xl font-semibold">{title}</div>
 
-      <div className="flex items-center gap-2 text-2xl font-semibold">
-        Bed:{" "}
-        {patientList
-          .filter((p) => p.isDue)
-          .map((p, index) => {
-            return (
-              <div key={index} className="">
-                {p.bed},
-              </div>
-            );
-          })}
-      </div>
+      {patientList && patientList.length > 0 && (
+        <div className="flex items-center gap-2 text-2xl font-semibold">
+          Bed:{" "}
+          {patientList
+            .filter((p) => p.isDue)
+            .map((p, index) => {
+              return (
+                <div key={index} className="">
+                  {p.bed},
+                </div>
+              );
+            })}
+        </div>
+      )}
 
       <div>
         <table className="w-full table-auto border border-gray-400 text-center">
@@ -181,6 +189,7 @@ export default function Home() {
           </thead>
           <tbody>
             {patientList &&
+              patientList.length > 0 &&
               patientList.map((patient, index) => {
                 return (
                   <tr
@@ -191,7 +200,6 @@ export default function Home() {
                   >
                     <td className="border border-gray-400 px-2">{patient.bed}</td>
                     <td className="border border-gray-400 px-2 text-left">{patient.name}</td>
-                    {/* <td className="border border-gray-400 px-2">{patient.admission.split(" ")[0]}</td> */}
                     <td className="border border-gray-400 px-2">{patient.admission}</td>
                     <td className="border border-gray-400 px-2">{patient.day}</td>
                     <td className="border border-gray-400 px-2">{patient.isDue ? "Due" : ""}</td>
@@ -203,8 +211,8 @@ export default function Home() {
       </div>
 
       <ul className="list-disc list-inside">
-        <li>May include people who does not need swab</li>
-        <li>Check who is being transferred in days</li>
+        <li>Double check the result</li>
+        <li>Use this as a guide</li>
       </ul>
     </div>
   );
