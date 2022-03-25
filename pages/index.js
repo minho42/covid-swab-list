@@ -39,7 +39,14 @@ export default function Home() {
     const isColumnsTooShort = list[0].length < 4;
     const isIncludingColon = list[0].some((item) => item.includes(":")); // admission
     const isIncludingComma = list[0].some((item) => item.includes(",")); // name
-    if (isListEmpty || isColumnsTooShort || !isIncludingColon || !isIncludingComma) {
+    const isAdmissionIndexCorrect = list[0][indexForAdmission].includes(":");
+    if (
+      isListEmpty ||
+      isColumnsTooShort ||
+      !isIncludingColon ||
+      !isIncludingComma ||
+      !isAdmissionIndexCorrect
+    ) {
       return false;
     }
     return true;
@@ -68,7 +75,7 @@ export default function Home() {
         });
 
       if (!isClipboardDataValid(tempClipboardData)) {
-        throw new Error("Clipboard data invalid");
+        throw new Error("Invalid clipboard data or incorrect index for columns");
       }
 
       setClipboardData(tempClipboardData);
