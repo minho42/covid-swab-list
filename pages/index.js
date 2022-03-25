@@ -37,9 +37,9 @@ export default function Home() {
   function isClipboardDataValid(list) {
     const isListEmpty = list.length === 0;
     const isColumnsTooShort = list[0].length < 4;
-    const isIncludingColon = list[0].some((item) => item.includes(":")); // admission
-    const isIncludingComma = list[0].some((item) => item.includes(",")); // name
-    const isAdmissionIndexCorrect = list[0][indexForAdmission].includes(":");
+    const isIncludingColon = list[0].some((item) => item?.includes(":")); // admission
+    const isIncludingComma = list[0].some((item) => item?.includes(",")); // name
+    const isAdmissionIndexCorrect = list[0][indexForAdmission]?.includes(":");
     if (
       isListEmpty ||
       isColumnsTooShort ||
