@@ -12,7 +12,7 @@ const getDayDiffFrom = (d) => {
 
   const diff = today.getTime() - dateFrom.getTime();
   const diffInDay = diff / (1000 * 60 * 60 * 24);
-  return Math.round(diffInDay);
+  return Math.floor(diffInDay);
 };
 
 export default function Home() {
