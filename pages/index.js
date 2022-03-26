@@ -12,8 +12,6 @@ const getDayDiffFrom = (d) => {
   const today = new Date();
   console.log(dateFrom);
   console.log(today);
-  console.log(typeof dateFrom);
-  console.log(typeof today);
   // const diff = today.getTime() - dateFrom.getTime();
   // const diffInDay = diff / (1000 * 60 * 60 * 24);
 
@@ -30,14 +28,10 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState("");
   const [clipboardData, setClipboardData] = useState([]);
   const [patientList, setPatientList] = useState([]);
-  const [hideNotDue, setHideNotDue] = useState(true);
+  const [hideNotDue, setHideNotDue] = useState(false);
 
   const title = `Covid swabs due for ${new Date().toLocaleDateString()}, ${daysOfWeek[new Date().getDay()]} 
-   ${
-     patientList && patientList?.length > 0
-       ? `(${patientList.filter((p) => p.isDue).length}/${patientList.length})`
-       : ""
-   }
+   ${patientList && patientList?.length > 0 ? `(${patientList.filter((p) => p.isDue).length})` : ""}
   `;
 
   function isClipboardDataValid(list) {
@@ -149,7 +143,7 @@ export default function Home() {
               onChange={() => setHideNotDue(!hideNotDue)}
               className="ml-1 w-7 h-7"
               type="checkbox"
-              defaultChecked={!hideNotDue}
+              checked={!hideNotDue}
             ></input>
           </label>
         )}
