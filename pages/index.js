@@ -1,22 +1,20 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { useLocalStorage } from "../components/useLocalStorage";
-import { differenceInDays } from "date-fns";
 
 const getDayDiffFrom = (d) => {
   // "14/03/2022 22:30"
   if (!d || d.length == 0) return -1;
 
   const [day, month, year] = d.split(" ")[0].split("/");
-  const dateFrom = new Date(`${year}-${month}-${day}`);
-  const today = new Date();
+  // Remove times by calling toLocaleDateString
+  const dateFrom = new Date(new Date(`${year}-${month}-${day}`).toLocaleDateString("en-US"));
+  const today = new Date(new Date().toLocaleDateString("en-US"));
   console.log(dateFrom);
   console.log(today);
-  // const diff = today.getTime() - dateFrom.getTime();
-  // const diffInDay = diff / (1000 * 60 * 60 * 24);
-
-  return differenceInDays(today, dateFrom);
-  // return Math.floor(diffInDay);
+  const diff = today.getTime() - dateFrom.getTime();
+  const diffInDay = diff / (1000 * 60 * 60 * 24);
+  return Math.floor(diffInDay);
 };
 
 export default function Home() {
